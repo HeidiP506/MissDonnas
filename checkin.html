@@ -3,20 +3,138 @@
 <head>
   <title>Check In / Out</title>
   <link rel="stylesheet" href="styles.css">
+  <style>
+    table, th, td {
+      border: 1px solid black;
+      border-collapse: collapse;
+      padding: 8px;
+    }
+  </style>
 </head>
 <body>
-  <h2>Check In / Check Out</h2>
-  <form>
-    <label>Child's Name: <input type="text" name="childName" required></label><br><br>
-    <label>
-      Action:
-      <select name="action">
-        <option value="checkin">Check In</option>
-        <option value="checkout">Check Out</option>
-      </select>
-    </label><br><br>
-    <button type="submit">Submit</button>
-  </form>
-  <p><em>This version doesn't save anything yet — but we’ll add that later!</em></p>
+  <h1>Check In / Out</h1>
+  <p>This page lets you track student check-ins and outs with time stamps.</p>
+
+  <table id="kidsTable">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Pickup Time</th>
+        <th>Check In</th>
+        <th>Check Out</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Kid rows will go here -->
+    </tbody>
+  </table>
+
+  <script>
+    const kids = [
+      { name: "Oaklyn Baroli", dropoff: "8 AM", pickup: "5 PM" },
+      { name: "Magnolia beiluss",dropoff: "9 AM", pickup: "3:30 PM"},
+      { name: "Ben Beer", dropoff: "9 AM", pickup: "3:30 PM"  },
+      { name: "Joe Bently", dropoff: "8 AM", pickup: "5 PM"  },
+      { name: "Orla Bently", dropoff: "8 AM", pickup: "5 PM"  },
+      { name: "Ben Boggs", dropoff: "8 AM", pickup: "5 PM"  },
+      { name: "Nora Boggs", dropoff: "8 AM", pickup: "5 PM"  },
+      { name: "Monroe Briggs", dropoff: "8 AM", pickup: "5 PM"  },
+      { name: "Clayton Brothers", dropoff: "9 AM", pickup: "3:30 PM"  },
+      { name: "Maddie Brothers", dropoff: "9 AM", pickup: "3:30 PM"  },
+      { name: "Mali Brothers", dropoff: "9 AM", pickup: "3:30 PM"  },
+      { name: "Theo Brothers", dropoff: "9 AM", pickup: "3:30 PM"  },
+      { name: "Regina Chavira", dropoff: "8 AM", pickup: "5 PM"  },
+      { name: "Luke Cote", dropoff: "9 AM", pickup: "3:30 PM"  },
+      { name: "Frankie DiDonato", dropoff: "9 AM", pickup: "3:30 PM"  },
+      { name: "Rory DiDonato", dropoff: "9 AM", pickup: "3:30 PM"  },
+      { name: "Olivia Doty", dropoff: "9 AM", pickup: "3:30 PM"  },
+      { name: "Sofia Freeman", dropoff: "9 AM", pickup: "3:30 PM"  },
+      { name: "Hunter Hill", dropoff: "9 AM", pickup: "3:30 PM"  },
+      { name: "Aura Kiel", dropoff: "8 AM", pickup: "5 PM"  },
+      { name: "Vada Kiel", dropoff: "8 AM", pickup: "5 PM"  },
+      { name: "Ben Kiseda", dropoff: "8 AM", pickup: "5 PM"  },
+      { name: "Henry Kiseda", dropoff: "8 AM", pickup: "5 PM"  },
+      { name: "James Kokoszka", dropoff: "9 AM", pickup: "3:30 PM"  },
+      { name: "Ryan Kokoszka", dropoff: "9 AM", pickup: "3:30 PM"  },
+      { name: "Lenny Kroning", dropoff: "9 AM", pickup: "3:30 PM"  },
+      { name: "Neera Krishna", dropoff: "8 AM", pickup: "5 PM"  },
+      { name: "Claire Laffey", dropoff: "8 AM", pickup: "5 PM"  },
+      { name: "Jack Laffey", dropoff: "8 AM", pickup: "5 PM"  },
+      { name: "Luciana Lajcaj", dropoff: "9 AM", pickup: "3:30 PM"  },
+      { name: "Marcella Lajcaj", dropoff: "9 AM", pickup: "3:30 PM"  },
+      { name: "David Micoff", dropoff: "9 AM", pickup: "3:30 PM"  },
+      { name: "Veda Moon", dropoff: "9 AM", pickup: "3:30 PM"  },
+      { name: "Mackenzie Mullen", dropoff: "8 AM", pickup: "5 PM"  },
+      { name: "Riverly Mullen", dropoff: "8 AM", pickup: "5 PM"  },
+      { name: "Caden Olson", dropoff: "8 AM", pickup: "5 PM"  },
+      { name: "Finan Olson", dropoff: "8 AM", pickup: "5 PM"  },
+      { name: "Roohika Parachoori", dropoff: "8 AM", pickup: "5 PM"  },
+      { name: "Asa Perna", dropoff: "9 AM", pickup: "3:30 PM"  },
+      { name: "Ava Perna", dropoff: "9 AM", pickup: "3:30 PM"  },
+      { name: "Lincoln Rhodes", dropoff: "9 AM", pickup: "3:30 PM"  },
+      { name: "Maisha Sanjay", dropoff: "8 AM", pickup: "5 PM"  },
+      { name: "Logan Shin", dropoff: "9 AM", pickup: "3:30 PM"  },
+      { name: "Loryn Shin", dropoff: "9 AM", pickup: "3:30 PM"  },
+      { name: "Mason Sidor", dropoff: "8 AM", pickup: "5 PM"  },
+      { name: "Ashley Slattery", dropoff: "9 AM", pickup: "3:30 PM"  },
+      { name: "Raymond Vasquez", dropoff: "8 AM", pickup: "5 PM"  },
+      { name: "Savarnik Venna", dropoff: "8 AM", pickup: "5 PM"  },
+    ];
+    
+
+    const tableBody = document.querySelector("#kidsTable tbody");
+
+    function loadCheckData() {
+      return JSON.parse(localStorage.getItem("checkinData") || "{}");
+    }
+
+    function saveCheckData(data) {
+      localStorage.setItem("checkinData", JSON.stringify(data));
+    }
+
+    const checkData = loadCheckData();
+
+    kids.forEach(kid => {
+      const row = document.createElement("tr");
+
+      const nameCell = document.createElement("td");
+      nameCell.textContent = kid.name;
+
+      const pickupCell = document.createElement("td");
+      pickupCell.textContent = kid.pickup;
+
+      const checkinCell = document.createElement("td");
+      const checkinBtn = document.createElement("button");
+      checkinBtn.textContent = checkData[kid.name]?.checkin || "Check In";
+      checkinBtn.onclick = () => {
+        const time = new Date().toLocaleTimeString();
+        checkData[kid.name] = checkData[kid.name] || {};
+        checkData[kid.name].checkin = time;
+        checkinBtn.textContent = time;
+        saveCheckData(checkData);
+      };
+      checkinCell.appendChild(checkinBtn);
+
+      const checkoutCell = document.createElement("td");
+      const checkoutBtn = document.createElement("button");
+      checkoutBtn.textContent = checkData[kid.name]?.checkout || "Check Out";
+      checkoutBtn.onclick = () => {
+        const time = new Date().toLocaleTimeString();
+        checkData[kid.name] = checkData[kid.name] || {};
+        checkData[kid.name].checkout = time;
+        checkoutBtn.textContent = time;
+        saveCheckData(checkData);
+      };
+      checkoutCell.appendChild(checkoutBtn);
+
+      row.appendChild(nameCell);
+      row.appendChild(pickupCell);
+      row.appendChild(checkinCell);
+      row.appendChild(checkoutCell);
+
+      tableBody.appendChild(row);
+    });
+  </script>
 </body>
 </html>
+
